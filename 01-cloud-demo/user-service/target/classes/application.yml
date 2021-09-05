@@ -1,0 +1,30 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/cloud_user?useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+
+    # 下面注释掉，因为在bootstrap.yaml里面这些已经重复了。如果你想测试配置集群名称（部署在HZ或者SH），那就打开这段注释，相应地，注释掉bootstrap.yaml里面全部代码
+#  application:
+#    name: userservice   # user的服务名称
+#  cloud:
+#    nacos:
+#      server-addr: localhost:8848
+#      discovery:
+#        cluster-name: HZ # 集群名称
+mybatis:
+  type-aliases-package: cn.itcast.user.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    cn.itcast: debug
+pattern:
+  dateformat: daji
+#eureka:
+#  client:
+#    service-url:  # eureka的地址信息
+#      defaultZone: http://127.0.0.1:10086/eureka
