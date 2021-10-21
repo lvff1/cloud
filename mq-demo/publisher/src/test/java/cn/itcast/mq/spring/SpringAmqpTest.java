@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SpringAmqpTest {
@@ -55,5 +58,45 @@ public class SpringAmqpTest {
         //发送消息到交换机（不是之前的发送到队列了）
         //三个入参，分别是交换机名称、 routingKey(先不管，后面会讲到) 、消息
         rabbitTemplate.convertAndSend(exchangeName, "", message);
+    }
+    //测试DirectQueue的发送队列
+    //比起FanoutQueue，DirectQueue并不是发给every one，而是发给BindingKey相同的队列
+    //从这往上数第四行代码没说的routingKey，在这里就是BindingKey的意思了
+    @Test
+    public void testSendDirectExchange(){
+        //交换机名称
+        String exchangeName = "itcast.direct";
+        //消息（比起上面的Fanout 这里是只发送给bindingName为blue的消息队列）
+        //你也可以写hello， yellow，然后绑定下面的routingKey为yellow，那就是只发送给bindingName为yellow的队列了
+        String message = "hello, blue!";
+        //发送消息到交换机
+        //三个入参，分别是交换机名称、 BindingKey 、消息
+        rabbitTemplate.convertAndSend(exchangeName, "blue", message);
+    }
+
+
+    //测试TopicQueue的发送队列
+    //比起DirectQueue，TopicQueue的唯一区别就是在DIrectQueue的基础上支持通配符
+    @Test
+    public void testSendTopicExchange(){
+        //交换机名称
+        String exchangeName = "itcast.topic";
+        //消息（比起上面的Fanout 这里是只发送给bindingName为blue的消息队列）
+        //你也可以写hello， yellow，然后绑定下面的routingKey为yellow，那就是只发送给bindingName为yellow的队列了
+        String message = "大新闻！！！！！！！！！！！！！";
+        //发送消息到交换机
+        //由于通配符的缘故，下面3行代码可以被不同的监听队列监听到。不信的话可以挨个打开注释试试
+        rabbitTemplate.convertAndSend(exchangeName, "china.news", message); //listenTopicQueue1和listenTopicQueue2都能收到
+        //rabbitTemplate.convertAndSend(exchangeName, "china.daji", message);   //only listenTopicQueue1能收到
+        //rabbitTemplate.convertAndSend(exchangeName, "japan.news", message);   //only listenTopicQueue2能收到
+    }
+
+    //发送一个对象
+    @Test
+    public void testSendObjectQueue(){
+        Map<String,Object> msg = new HashMap<>();
+        msg.put("name","大吉");
+        msg.put("age","21");
+        rabbitTemplate.convertAndSend("object.queue", msg);
     }
 }

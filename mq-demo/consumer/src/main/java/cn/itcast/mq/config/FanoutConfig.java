@@ -19,6 +19,16 @@ import org.springframework.context.annotation.Configuration;
 public class FanoutConfig {
 
     public Logger logger = LoggerFactory.getLogger(FanoutConfig.class);
+    @Bean
+    public Queue simpleQueue(){
+        return new Queue("simple.queue");
+    }
+    //声明一个队列，我们准备往这个队列里扔进任意对象(Object)
+    @Bean
+    public Queue objectQueue(){
+        return new Queue("object.queue");
+    }
+
     //itcast.fanout 声明交换机
     @Bean
     public FanoutExchange fanoutExchange(){
@@ -46,7 +56,7 @@ public class FanoutConfig {
     //绑定队列2到交换机.
     @Bean
     public Binding fanoutBinding2(Queue fanoutQueue2, FanoutExchange fanoutExchange){
-        logger.info("已绑定队列1和队列2到交换机");
+        //logger.info("已绑定队列1和队列2到交换机");
         return BindingBuilder.bind(fanoutQueue2).to(fanoutExchange);
     }
 }
