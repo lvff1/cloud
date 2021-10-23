@@ -414,7 +414,8 @@
       },
       location(loc) {
         let arr = loc.split(", ");
-        let json = '[' + arr[1] + ', ' + arr[0] + ']'
+        let json = '[' + arr[0] + ']'
+        //debugger
         return JSON.parse(json);
       },
       initMarker() {
