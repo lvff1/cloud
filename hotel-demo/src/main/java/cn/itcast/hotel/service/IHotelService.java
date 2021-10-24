@@ -14,4 +14,10 @@ public interface IHotelService extends IService<Hotel> {
     public PageResult search(RequestParams params) throws IOException;
 
     public Map<String, List<String>> filters(RequestParams params) throws IOException;
+
+    List<String> getSuggestions(String prefix) throws IOException;
+
+    void deleteESById(Long msg);
+
+    void insertOrUpdateESById(Long msg);
 }

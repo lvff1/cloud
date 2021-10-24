@@ -3,6 +3,9 @@ package cn.itcast.hotel.pojo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 /*
@@ -23,7 +26,8 @@ public class HotelDoc {
     private String pic;
     private Object distance;
     private boolean isAD;
-
+    //自动补全数组。brand商标字段、name字段、business商圈字段可以用于自动补全
+    private List<String> suggestion;
     //复制Hotel实体给HotelDoc
     public HotelDoc(Hotel hotel) {
         this.id = hotel.getId();
@@ -40,6 +44,11 @@ public class HotelDoc {
         //2021.10.22 debug：这里的拼接经纬度必须正确，逗号必须是英文，而且拼接的参数不能有空格，否则ES就会自动把经纬度类型转换成test类型！！！
         this.location = hotel.getLatitude() + "," + hotel.getLongitude();  //拼接经纬度（因为ES的实体格式长这样）
         this.pic = hotel.getPic();
+        /*
+        *   该方法是将数组转化成List集合的方法,例：
+            List<String> list = Arrays.asList("a","b","c");
+        * */
+        this.suggestion = Arrays.asList(this.brand, this.business);
     }
 
     //DEBUG:这里的判断是否是AD字段，不能用lombok自动生成，也不能用alt+insert的方法生成，因为布尔类型的自动生成会抽风，需要手写

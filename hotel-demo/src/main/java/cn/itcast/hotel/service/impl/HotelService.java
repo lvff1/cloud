@@ -9,12 +9,15 @@ import cn.itcast.hotel.service.IHotelService;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.unit.DistanceUnit;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -28,6 +31,10 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +103,63 @@ public class HotelService extends ServiceImpl<HotelMapper, Hotel> implements IHo
         List<String> starAgg = getAggByName(aggregations, "starAgg");
         result.put("starName",starAgg);
         return result;
+    }
+
+    @Override
+    public List<String> getSuggestions(String prefix) throws IOException {
+        //1、准备request
+        SearchRequest request = new SearchRequest("hotel");
+        //2、准备DSL
+        request.source().suggest(new SuggestBuilder().addSuggestion(
+                "suggestions",  //自定义的补全查询名称
+                SuggestBuilders.completionSuggestion("suggestion")
+                        .prefix(prefix)
+                        .skipDuplicates(true)
+                        .size(10)
+        ));
+        //3、发送请求
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+
+        //4、逐层解析结果
+        Suggest suggest = response.getSuggest();
+        CompletionSuggestion suggestions = suggest.getSuggestion("suggestions"); //填写上面你自定义好的补全查询名称
+        //获取option
+        List<CompletionSuggestion.Entry.Option> options = suggestions.getOptions();
+        List<String> list = new ArrayList<>(options.size());
+        for (CompletionSuggestion.Entry.Option option : options) {
+            String text = option.getText().toString();
+            list.add(text);
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteESById(Long msg) {
+        DeleteRequest request = new DeleteRequest("hotel", msg.toString());
+        try {
+            client.delete(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void insertOrUpdateESById(Long msg) {
+        //先根据id去数据库查出来酒店数据，然后把该数据发送到索引库里面去
+        Hotel hotel = getById(msg);
+        //将数据库数据转换为索引库数据
+        HotelDoc hotelDoc = new HotelDoc(hotel);
+        //1、准备Request对象
+        IndexRequest request = new IndexRequest("hotel").id(hotel.getId().toString());
+        //2、准备Json文档(包含了FastJSON的序列化操作)
+        request.source(JSON.toJSONString(hotelDoc), XContentType.JSON);
+        //3、发送请求(发送的方法和操作索引库的方法不同了)
+        try {
+            client.index(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private List<String> getAggByName(Aggregations aggregations, String aggName) {
