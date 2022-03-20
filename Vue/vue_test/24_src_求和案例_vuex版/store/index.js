@@ -17,6 +17,9 @@ const actions = {
 	}, */
 	jiaOdd(context,value){
 		console.log('actions中的jiaOdd被调用了')
+		//context里面可以取到state的值，也能调用commit将actions的属性传递给mutations
+		//context里面可以取到state的值，也能调用commit将actions的属性传递给mutations
+		//context里面可以取到state的值，也能调用commit将actions的属性传递给mutations
 		if(context.state.sum % 2){
 			context.commit('JIA',value)
 		}
@@ -29,6 +32,9 @@ const actions = {
 	}
 }
 //准备mutations——用于操作数据（state）
+//只有需要对state里面的数据进行更新才能用mutations实现，actions只能读state，并没有权限更新state
+//只有需要对state里面的数据进行更新才能用mutations实现，actions只能读state，并没有权限更新state
+//只有需要对state里面的数据进行更新才能用mutations实现，actions只能读state，并没有权限更新state
 const mutations = {
 	JIA(state,value){
 		console.log('mutations中的JIA被调用了')
