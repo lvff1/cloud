@@ -6,13 +6,15 @@
 
 
 
-**[SpringCloud详细速查笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/SpringCloud.md)，代码、配套资料见本页最上方文件夹SpringCloud**
+**[SpringCloud详细速查笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/SpringCloud/SpringCloud.md)，代码、配套资料见本页最上方文件夹SpringCloud**
 
-**[Vue 2022.03 4万字详细速查笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/Vue.md)，代码、配套资料见本页最上方文件夹Vue**
+**[Vue 2022.03 4万字详细速查笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/Vue/Vue.md)，代码、配套资料见本页最上方文件夹Vue**
 
-**[Linux 快速入门相关资料&Linux桌面发行版安装排坑笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/Linux.md)，配套教程见本页最上方文件夹Linux**
+**[Linux 快速入门相关资料&Linux桌面发行版安装排坑笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/Linux/Linux%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8%E7%AC%94%E8%AE%B0.md)，配套教程见本页最上方文件夹Linux**
 
-**【毕业设计之】基于SpringBoot + MyBatis + Thymeleaf 从零开发的个人博客系统笔记篇（点我仓库内跳转），源码、配套资料见本页最上方文件夹 DajiBlog**
+* Linux文件夹中还包括了桌面发行版（Manjaro、Deepin等）的排坑记录
+
+**[【毕业设计之】基于SpringBoot + MyBatis + Thymeleaf 从零开发的个人博客系统笔记篇（点我仓库内跳转）](https://gitee.com/da-ji/full-stack-developer/blob/master/DajiBlog/DajiBlog.md)，源码、配套资料见本页最上方文件夹 DajiBlog**
 
 【毕业设计之】基于Vue + MyBatis + SpringBoot 前后端分离的xx商城系统实现（待更新，未完待续）
 
