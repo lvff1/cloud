@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客管理</title>
+  <link th:href="@{/images/favicon.ico}" href="../../static/images/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+  <link th:href="@{/css/me.css}" rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+  <!--导航栏-->
+  <nav class="ui inverted gird-header" >
+    <div class="ui container">
+      <div class="ui inverted secondary stackable menu">
+        <h2 class="ui olive header item" style="font-family: STSong">管理后台</h2>
+        <a href="#" th:href="@{/admin/blogs}" class="active m-item item m-mobile-hide"><i class="home icon"></i>文章管理</a>
+        <a href="#" th:href="@{/admin/types}" class=" m-item item m-mobile-hide"><i class="clone outline icon"></i>分类管理</a>
+        <a href="#" th:href="@{/admin/friendlinks}" class=" m-item item m-mobile-hide"><i class="pencil alternate icon"></i>友链管理</a>
+        <a href="#" th:href="@{/admin/pictures}" class=" m-item item m-mobile-hide"><i class="image icon"></i>相册管理</a>
+        <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+        <div class="right m-item m-mobile-hide menu" th:if="${session.loginedadmin}">
+          <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+          <div class="ui dropdown  item">
+            <div class="text">
+              <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+              <img class="ui avatar image" src="/images/dajiavatar.jpg">
+              <!--非常重要, model.addAttribute传对象 的前端接收!-->
+              <span th:text="${session.loginedadmin.nickname}"></span>
+            </div>
+            <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+            <i class="dropdown icon"></i>
+            <div class="menu">
+              <a class="item" th:href="@{/admin/adminlogout}">注销</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+      <i class="sidebar icon"></i>
+    </a>
+  </nav>
+  <div class="m-padded-tb-hugex">
+    <div class="ui menu attached inverted" style="background-color:rgba(255, 255, 255, 0.1)">
+      <div class="ui container" >
+        <a th:href="@{/admin/blogs/input}" class="item" >发布</a>
+        <a th:href="@{/admin/blogs}" class="active item">列表</a>
+      </div>
+    </div>
+  </div>
+
+
+  <br>
+  <br>
+  <br>
+
+  <!--中间内容-->
+  <div  class="">
+    <div class="ui container">
+      <div align="left">
+        <a href="#" th:href="@{/admin/blogs}">
+          <button type="button" class="ui teal button m-mobile-wide m-margin-top"><i class="chevron left icon"></i>返回全部博客列表</button>
+        </a>
+      </div>
+      <br>
+      <div id="table-container">
+        <table th:fragment="blogList" class="ui compact teal table" style="margin: 1px">
+          <div class="ui fluid button" align="center" style="color: #A0A0A0"><font size="4" color="#708090">搜索结果</font></div>
+          <thead>
+          <tr align="center">
+            <th>ID</th>
+            <th>标题</th>
+            <th>类型</th>
+            <th>推荐</th>
+            <th>状态</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr align="center" th:each="blog,iterStat : ${blogQueries}">
+            <td th:text="${iterStat.count}">1</td>
+            <td th:text="${blog.title}">博客标题</td>
+            <td th:text="${blog.types[0].name}">博客的分类们</td>
+
+            <td th:text="${blog.recommend} ? '是':'否'">是</td>
+            <td th:text="${blog.published} ? '发布':'草稿'">草稿</td>
+            <!--日期和时间格式是这么写的-->
+            <td th:text="${#dates.format(blog.updateTime,'yyyy-MM-dd HH:mm')}">2020-01-02 05:20</td>
+            <td>
+              <!--th:href="@{/admin/types/{id}/input(id=${type.id})}"-->
+              <a href="#" th:href="@{/admin/blogs/{id}/input(id=${blog.id})}" class="ui mini teal basic button">编辑</a>
+              <a href="#" th:href="@{/admin/blogs/{id}/delete(id=${blog.id})}" onclick="return confirm('确定要删除该文章吗？三思啊! 删了可就没了！')" class="ui mini red basic button">删除</a>
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <th colspan="7">
+              <div class="ui inverted divided stackable grid">
+                <div class="three wide column" align="center">
+                  <!--上一页的校验逻辑，比较麻烦-->
+                  <a class="item" th:href="@{/admin/blogs/search(startIndex=${recentStartIndex-pageSize > 0} ? ${recentStartIndex-pageSize} : 0,title=${searchBlog.title},typeId=${searchBlog.typeId})}" >上一页</a>
+                </div>
+
+                <div class="ten wide column" align="center">
+                  <!--
+                    第几页能算出来：
+                    pagesize：  3
+                    startIndex：0   3   6   9    是一个从0开始，每次+pagesize的关系
+                    当前页：    1   2    3   4
+                    通过观察可得之，当前是第几页就是 recentStartIndex/pageSize+1
+                  -->
+                  <p>第 <span th:text="${recentStartIndex/pageSize+1}"></span> 页，共 <span th:text="${totalPages}"></span> 页，有 <span th:text="${totalBlogs}"></span> 篇文章</p>
+                </div>
+
+                <div class="three wide column" align="center">
+                  <!--
+                    为啥下一页不做校验了？因为下一页的校验在后台完成了，前台不用担心
+                    感觉这里没有体现出前后端分离，代码比较耦合
+                    括号传递多个参数，用，逗号。浏览器会自动拼接成&
+                    打断点和单步调试在这里立了大功！！！！！！！！！！！！
+                  -->
+                  <a class="item" th:href="@{/admin/blogs/search(startIndex=${recentStartIndex+pageSize},title=${searchBlog.title},typeId=${searchBlog.typeId})}" >下一页</a>
+                </div>
+              </div>
+
+            </th>
+          </tr>
+          </tfoot>
+        </table>
+
+        <div class="ui mini negative message" th:unless="${#strings.isEmpty(negativeMessage)}" th:text="|提示： ${negativeMessage}|">提示:</div>
+        <div class="ui success message" th:unless="${#strings.isEmpty(message)}">
+          <i class="close icon"></i>
+          <div class="" th:text="|提示： ${message}">提示：操作成功！</div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <!--底部栏-->
+
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+
+  <script>
+      // $('#newblog-container').load(/*[[@{/footer/newblog}]]*/"/footer/newblog");
+
+      $('#blog-message').load(/*[[@{/footer/blogmessage}]]*/"/footer/blogmessage");
+
+      // 运行时间统计
+      function secondToDate(second) {
+          if (!second) {
+              return 0;
+          }
+          var time = new Array(0, 0, 0, 0, 0);
+          if (second >= 365 * 24 * 3600) {
+              time[0] = parseInt(second / (365 * 24 * 3600));
+              second %= 365 * 24 * 3600;
+          }
+          if (second >= 24 * 3600) {
+              time[1] = parseInt(second / (24 * 3600));
+              second %= 24 * 3600;
+          }
+          if (second >= 3600) {
+              time[2] = parseInt(second / 3600);
+              second %= 3600;
+          }
+          if (second >= 60) {
+              time[3] = parseInt(second / 60);
+              second %= 60;
+          }
+          if (second > 0) {
+              time[4] = second;
+          }
+          return time;
+      }
+      function setTime() {
+          /*此处为网站的创建时间*/
+          var create_time = Math.round(new Date(Date.UTC(2020, 01, 25, 15, 15, 15)).getTime() / 1000);
+          var timestamp = Math.round((new Date().getTime() + 8 * 60 * 60 * 1000) / 1000);
+          currentTime = secondToDate((timestamp - create_time));
+          currentTimeHtml = currentTime[0] + '年' + currentTime[1] + '天'
+              + currentTime[2] + '时' + currentTime[3] + '分' + currentTime[4]
+              + '秒';
+          document.getElementById("htmer_time").innerHTML = currentTimeHtml;
+      }
+      setInterval(setTime, 1000);
+
+
+
+
+    $('.menu.toggle').click(function () {
+      $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $('.ui.dropdown').dropdown({
+      on : 'hover'
+    });
+
+    //消息提示关闭初始化
+    $('.message .close')
+      .on('click', function () {
+        $(this)
+          .closest('.message')
+          .transition('fade');
+      });
+
+    $('#clear-btn')
+      .on('click', function() {
+        $('.ui.type.dropdown')
+          .dropdown('clear')
+        ;
+      })
+    ;
+
+    function page(obj) {
+      $("[name='page']").val($(obj).data("page"));
+      loaddata();
+    }
+
+
+  </script>
+</body>
+</html>

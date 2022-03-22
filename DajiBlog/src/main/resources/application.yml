@@ -1,0 +1,40 @@
+# Spring
+spring:
+  # 关闭模板引擎的缓存
+  thymeleaf:
+    cache: false
+  # 整合mybatis
+  datasource:
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/daji_ssm?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  # 整合redis
+  # redis:
+    # host: 8.131.237.22
+    # host: 47.100.53.56
+    # host: 127.0.0.1
+    # port: 6379
+    # 设置密码
+    # password: "swt556u"
+
+# Mybatis
+mybatis:
+  type-aliases-package: com.daji.pojo
+  mapper-locations: classpath:mapper/*.xml
+  # 需要修改这里，才能让log4j2输出sql
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# 群里大神给我的log4j2 日志文件的配置
+logging:
+  level:
+    root: warn
+    com.cj: debug
+  # 下面是日志存放路径 如果照着下面配置，会在你当前的相对路径会创建一个data文件夹。如果是Linux，会在jar包的同级目录生成一个data文件夹
+  file: daji/blog-pro.log
+
+
+

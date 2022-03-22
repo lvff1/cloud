@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.daji.dao.RedisSyncDao">
+
+    <resultMap id="user" type="com.daji.pojo.User">
+
+    </resultMap>
+
+    <!--同步user表-->
+    <select id="syncUser" resultMap="user">
+        SELECT *
+        FROM
+        user
+    </select>
+
+
+    <resultMap id="blog" type="com.daji.pojo.Blog">
+        <id property="id" column="id"/>
+        <result property="flag" column="flag"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="description" column="description"/>
+        <result property="recommend" column="recommend"/>
+        <result property="published" column="published"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="views" column="views"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="commentCount" column="comment_count"/>
+    </resultMap>
+
+    <!--同步t_blog表-->
+    <select id="syncT_Blog" resultMap="blog">
+        SELECT *
+        FROM
+        t_blog
+    </select>
+
+    <resultMap id="type" type="com.daji.pojo.Type">
+
+    </resultMap>
+
+    <!--同步t_type表-->
+    <select id="syncT_Type" resultMap="type">
+        SELECT *
+        FROM
+        t_type
+    </select>
+
+    <resultMap id="comment" type="com.daji.pojo.Comment">
+        <result property="createTime" column="create_time"/>
+        <result property="parentCommentId" column="parent_comment_id"/>
+        <result property="adminComment" column="admin_comment"/>
+    </resultMap>
+    <!--同步t_comment表-->
+    <select id="syncT_Comment" resultMap="comment">
+        SELECT *
+        FROM
+        t_comment
+    </select>
+
+    <resultMap id="message" type="com.daji.pojo.Message">
+        <result property="createTime" column="create_time"/>
+        <result property="parentMessageId" column="parent_message_id"/>
+        <result property="adminMessage" column="admin_message"/>
+    </resultMap>
+    <!--同步t_message表-->
+    <select id="syncT_Message" resultMap="message">
+        SELECT *
+        FROM
+        t_message
+    </select>
+
+
+
+
+</mapper>

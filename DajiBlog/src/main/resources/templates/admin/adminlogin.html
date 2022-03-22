@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <!--移动端的预览设置，用于适配移动端-->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/Semantic-UI-CSS-master/semantic.min.css}" href="../../static/Semantic-UI-CSS-master/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/myblog.css}" href="../../static/css/myblog.css">
+    <title>后台管理</title>
+
+
+</head>
+<body style="background-image: url(/images/dashboardbackground.png)">
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div class="ui middle aligned center aligned grid m-container-small m-padded-tb-big">
+    <div class="column">
+        <h2 class="ui teal image header">
+            <div class="content header">
+                管理员登录
+            </div>
+        </h2>
+        <form class="ui large form" method="post" th:action="@{/adminlogin}">
+            <div class="ui stacked segment" style="background-color:rgba(255, 255, 255, 0.1)">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="adminname" placeholder="账号">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="密码">
+                    </div>
+                </div>
+                <button class="ui fluid large teal submit button" type="submit">登录</button>
+            </div>
+
+            <div class="ui error message"></div>
+
+        </form>
+        <div class="ui inverted form message" style="background-color:rgba(255, 255, 255, 0.1)">
+            <a th:href="@{/article}">回首页</a>
+        </div>
+        <!--回显错误信息-->
+        <div style="margin: auto" align="center">
+            <h3>
+                <font color="red"><p th:text="${adminloginerror}"></p></font>
+                <br>
+            </h3>
+        </div>
+
+
+    </div>
+</div>
+
+
+<!---->
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <!--底部footer-->
+
+
+
+    <script th:src="@{/js/jquery-3.5.1.min.js}" src="../../static/js/jquery-3.5.1.min.js"></script>
+    <script th:src="@{/Semantic-UI-CSS-master/semantic.min.js}" src="../../static/Semantic-UI-CSS-master/semantic.min.js"></script>
+    <script  type="text/javascript">
+
+        $("#b1").click(function (){
+            $(".m-item").toggleClass("m-mobile-hide");
+        });
+
+
+
+        $('.ui.dropdown').dropdown({
+            on: 'hover'
+        })
+
+
+        var currentPage=1;
+        var size=6;
+        var begin=0;
+
+        function initialization() {
+            begin=0;
+            loadData();
+        }
+        function next() {
+            currentPage++;
+            begin+=size;
+            loadData();
+        }
+        function pre() {
+            if (begin>0){
+                begin-=size;
+                loadData();
+            }
+        }
+        function loadData(){
+            $.ajax({
+                url:"/blogCombination_blogs",
+                data:{"begin":begin,"size":size,title:$("[name='title']").val(),type: $("[name='type']").val(),},
+                type:"get",
+                success:function (result) {
+                    $("#table-container").html(result);
+                }
+            })
+        }
+
+        function deleteBlog(button) {
+            $.ajax({
+                url: "/blog",
+                data:{"id":$(button).attr("data-id")},
+                type:"delete",
+                success:function(result){
+                    $("#table-container").html(result);
+                }
+            })
+        }
+
+
+
+    </script>
+
+</body>
+</html>

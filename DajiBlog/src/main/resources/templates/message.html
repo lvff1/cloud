@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="author" content="www.yanshisan.cn"/>
+    <meta name="robots" content="all"/>
+    <title>留言板</title>
+    <link rel="stylesheet" th:href="@{/font-awesome/css/font-awesome.min.css}" href="../static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" href="../static/layui/css/layui.css"/>
+    <link rel="stylesheet" th:href="@{/css/master.css}" href="../static/css/master.css"/>
+    <link rel="stylesheet" th:href="@{/css/gloable.css}" href="../static/css/gloable.css"/>
+    <link rel="stylesheet" th:href="@{/css/nprogress.css}" href="../static/css/nprogress.css"/>
+    <link rel="stylesheet" th:href="@{/css/message.css}" href="../static/css/message.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+</head>
+<body>
+<div class="header">
+</div>
+<header class="gird-header">
+    <div class="header-fixed">
+        <div class="header-inner">
+            <a href="javascript:void(0)" class="header-logo" id="logo" style="margin-top: 20px">Daji's Blog</a>
+            <nav class="nav" id="nav">
+                <ul>
+                    <li><a href="index.html" th:href="@{/index}">首页</a></li>
+                    <li><a href="article.html" th:href="@{/article}">博客</a></li>
+                    <li><a href="message.html" th:href="@{/message}" class="active">留言</a></li>
+                    <li><a href="link.html" th:href="@{/link}">友链</a></li>
+                    <li><a href="diary.html" th:href="@{/diary}">开发日志</a></li>
+                    <li><a href="about.html" th:href="@{/about}">关于我</a></li>
+                </ul>
+            </nav>
+            <a th:href="@{/toUserLogin}" class="blog-user" th:if="${session.logineduser}==null">
+                <i class="fa fa-user-circle-o"></i>
+            </a>
+
+            <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+            <div class="right m-item m-mobile-hide menu" align="right" th:if="${session.logineduser}">
+                <br>
+                <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                <div class="ui dropdown  item">
+                    <div class="text">
+                        <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+                        <img class="ui avatar image" th:src="${session.logineduser.avatar}">
+                        <!--非常重要, model.addAttribute传对象 的前端接收!-->
+                        <span th:text="${session.logineduser.nickname}"></span>
+                    </div>
+                    <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" th:href="@{/logout}">注销</a>
+                    </div>
+                </div>
+            </div>
+            <a class="phone-menu">
+                <i></i>
+                <i></i>
+                <i></i>
+            </a>
+        </div>
+    </div>
+</header>
+
+
+
+<div class="doc-container" id="doc-container">
+    <div class="container-fixed">
+
+        <div class="container-inner">
+            <!--留言提交模块-->
+            <section class="msg-remark">
+                <h1>留言板</h1>
+                <p>
+                    沟通交流，拉近你我！
+                </p>
+                <!--提交留言的表单-->
+                <div id="comment-form" class="ui form">
+                    <!--
+                        parentComment.id的默认值就是-1 代表该留言没有爹(是第一级留言)
+                    -->
+                    <input type="hidden" name="parentMessage.id" value="-1">
+                    <div class="field">
+                        <!--
+                            输入留言内容的区域
+                            id="remarkEditor" 是该区域能够输入表情的关键
+                            后面需要一段js代码的支持：
+                            <script src="../../static/js/pagemessage.js"></script>
+                        -->
+                        <textarea name="content" placeholder="请输入留言信息..."></textarea>
+                    </div>
+                    <div class="fields">
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <!--这里有两个隐藏域，姓名和邮箱。这个需要提交给后台，但是不用填写（从已登录的user的session里面就可以拿到这两个信息）-->
+                            <div class="ui left icon input">
+                                <!--后期将其弄成隐藏域，并把这条注释给删了就行-->
+                                <input type="hidden" name="nickname" placeholder="姓名" th:value="${session.logineduser}!=null ? ${session.logineduser.nickname}">
+                            </div>
+                        </div>
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <input type="hidden" id="email" name="email" placeholder="邮箱" th:value="${session.logineduser}!=null ? ${session.logineduser.email}">
+                            </div>
+                        </div>
+                        <div class="field  m-margin-bottom-small m-mobile-wide">
+                            <button id="commentpost-btn" type="button" class="ui teal button m-mobile-wide"><i class="edit icon"></i>发布</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!--留言区域列表-->
+        <div id="comment-container"  class="ui teal segment">
+            <!--
+                局部刷新技术 在CommentController里搜索主键：局部刷新
+                局部刷新下面 具有th:fragment属性的div
+            -->
+            <div th:fragment="messageList">
+                <div class="ui threaded comments" style="max-width: 100%;">
+                    <h3 class="ui">留言</h3>
+                    <div class="comment" th:each="message : ${messages}">
+                        <a class="avatar">
+                            <!--这里的th:src  加@，值会加上前缀，即会带上项目名。不加@，直接就是值本身-->
+                            <img src="https://unsplash.it/100/100?image=1005" th:src="${message.avatar}">
+                        </a>
+                        <div class="content">
+                            <a class="author" >
+                                <span th:text="${message.nickname}">Matt</span>
+                                <div class="ui mini basic teal left pointing label m-padded-mini" th:if="${message.adminMessage}">博主</div>
+                            </a>
+                            <div class="metadata">
+                                <span class="date" th:text="${#dates.format(message.createTime,'yyyy-MM-dd HH:mm')}">Today at 5:42PM</span>
+                            </div>
+                            <div class="text" th:text="${message.content}">
+                                How artistic!
+                            </div>
+                            <div class="actions">
+                                <!--
+                                    调用后面的 reply()方法
+                                    HTML5自定义属性之 【data-】
+                                    HTML5 增加了一项新功能是 自定义数据属性 ，也就是  data-* 自定义属性。
+                                    在HTML5中我们可以使用以 data- 为前缀来设置我们需要的自定义属性，来进行一些数据的存放。
+
+                                    应用在这里，就是设置了两个属性，一个是commentid="1" ; 另一个是commentnickname="Matt" （静态页面是这么操作的）
+                                    后面的th:attr就是配合前面的data- 来给属性动态赋值的 （完成动态赋值，连接Controller）
+
+                                    这样我们就有了两个属性，commentid和commentnickname。然后根据后面的onclick="reply(this)" 将这两个属性给传到后面的js代码里去
+                                    至于为啥不用驼峰命名法，（据说）传大写字母会导致js接收不到
+                                -->
+                                <a class="reply" data-messageid="1" data-messagenickname="Matt" th:attr="data-messageid=${message.id},data-messagenickname=${message.nickname}" onclick="reply(this)">回复</a>
+                            </div>
+                        </div>
+                        <!--回复留言的留言-->
+                        <div class="comments" th:if="${#arrays.length(message.replyMessages)}>0">
+                            <div class="comment" th:each="reply : ${message.replyMessages}">
+                                <a class="avatar">
+                                    <img src="https://unsplash.it/100/100?image=1005" th:src="@{${reply.avatar}}">
+                                </a>
+                                <div class="content">
+                                    <a class="author" >
+                                        <span th:text="${reply.nickname}">小红</span>
+                                        <div class="ui mini basic teal left pointing label m-padded-mini" th:if="${reply.adminMessage}">博主</div>
+                                        &nbsp;<span th:text="|@ ${reply.parentNickname}|" class="m-teal">@ 小白</span>
+                                    </a>
+                                    <div class="metadata">
+                                        <span class="date" th:text="${#dates.format(reply.createTime,'yyyy-MM-dd HH:mm')}">Today at 5:42PM</span>
+                                    </div>
+                                    <div class="text" th:text="${reply.content}">
+                                        How artistic!
+                                    </div>
+                                    <div class="actions">
+                                        <!--
+                                           调用后面的 reply()方法
+                                           HTML5自定义属性之 【data-】
+                                           HTML5 增加了一项新功能是 自定义数据属性 ，也就是  data-* 自定义属性。
+                                           在HTML5中我们可以使用以 data- 为前缀来设置我们需要的自定义属性，来进行一些数据的存放。
+
+                                           应用在这里，就是设置了两个属性，一个是commentid="1" ; 另一个是commentnickname="Matt" （静态页面是这么操作的）
+                                           后面的th:attr就是配合前面的data- 来给属性动态赋值的 （完成动态赋值，连接Controller）
+
+                                           这样我们就有了两个属性，commentid和commentnickname。然后根据后面的onclick="reply(this)" 将这两个属性给传到后面的js代码里去
+                                           至于为啥不用驼峰命名法，（据说）传大写字母会导致js接收不到
+                                       -->
+                                        <a class="reply" data-messageid="1" data-messagenickname="Matt" th:attr="data-messageid=${reply.id},data-messagenickname=${reply.nickname}" onclick="reply(this)">回复</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+<footer class="grid-footer">
+    <div class="footer-fixed">
+        <div class="copyright">
+            <div class="info">
+                <div class="contact">
+                    <a href="https://blog.csdn.net/weixin_44757863/" class="csdn" target="_blank" title="csdn"><i class="fa fa-github"></i></a>
+                    <a href="https://wpa.qq.com/msgrd?v=3&uin=396000449&site=qq&menu=yes" class="qq" target="_blank"
+                       title="396000449"><i class="fa fa-qq"></i></a>
+                    <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=1134107721@qq.com"
+                       class="email" target="_blank" title="1134107721@qq.com"><i class="fa fa-envelope"></i></a>
+                    <a th:href="@{/images/weixin_add.png}" target="_blank" class="weixin"><i class="fa fa-weixin"></i></a>
+                </div>
+                <p class="mt05">
+                    Copyright &copy; 2020-2021 大吉 All Rights Reserved <a href="http://beian.miit.gov.cn" target="_blank" style="color: inherit;">鲁ICP备2020049465号</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+<script th:src="@{/layui/layui.js}" src="../static/layui/layui.js"></script>
+<script th:src="@{/js/yss/gloable.js}" src="../static/js/yss/gloable.js"></script>
+<script th:src="@{/js/plugins/nprogress.js}" src="../static/js/plugins/nprogress.js"></script>
+<script>NProgress.start();</script>
+<script th:src="@{/js/pagemessage.js}" src="../static/js/pagemessage.js"></script>
+<script>NProgress.start();</script>
+<script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+<script>
+    //必须加上这里, 否则最右上角的下拉菜单的注销不会显示
+    /*
+        2020/12/2 调试了3小时都没找出来下拉注销不显示的原因。就是因为下面的 jquery和semantic版本的问题，必须是以下两个版本组合：
+        src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"
+        src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js
+        最开头的link里面引用的css也要对（上面是js）
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    */
+    $('.ui.dropdown').dropdown({
+        on: 'hover'
+    });
+    window.onload = function () {
+        NProgress.done();
+    };
+
+
+    //留言表单验证
+    $('.ui.form').form({
+        fields: {
+            title: {
+                identifier: 'content',
+                rules: [{
+                    type: 'empty',
+                    prompt: '请输入留言内容'
+                }
+                ]
+            }
+        }
+    });
+    //当页面初始化完成之后，加载所有留言列表
+    $(function () {
+        $("#comment-container").load("[[@{/message/load}]]");
+    });
+
+
+    //点一下博客发布按钮，会发生的事件
+    $('#commentpost-btn').click(function () {
+
+        //首先检查邮箱是否为空，假如为空，那么代表用户没登陆，没登陆当然不能发评论
+        var email = document.getElementById('email').value;
+        if (email == ""){
+            alert("请先登录"+email);
+        } else{
+            //上面有校验form不能为空的js代码。假如校验通过了
+            var boo = $('.ui.form').form('validate form');
+            if (boo) {
+                //假如校验通过了，那么调用postData方法，提交到Controller
+                console.log('校验成功');
+                postData();
+            } else {
+                console.log('校验失败');
+            }
+        }
+
+
+    });
+
+    function postData() {
+        //使用ajax的方式 向Controller提交表单
+        $("#comment-container").load("[[@{/message/load}]]",{
+            "parentMessageId" : $("[name='parentMessage.id']").val(),
+            "nickname": $("[name='nickname']").val(),
+            "email"   : $("[name='email']").val(),
+            "content" : $("[name='content']").val()
+        },function (responseTxt, statusTxt, xhr) {  //回调函数
+            //提交表单之后，调用clearContent()方法  会清理掉之前表单填写的东西
+            clearContent();
+        });
+    }
+    //清理掉之前表单填写的东西（还表单一个初始状态，方便下次输入）
+    function clearContent() {
+        $("[name='content']").val('');
+        $("[name='parentMessage.id']").val(-1);
+        $("[name='content']").attr("placeholder", "请输入留言信息...");
+    }
+
+    /*
+        搜索这个： onclick="reply(this)"   上面有2个标签都调用了该函数
+        点击回复按钮，会调用下面这个reply函数
+        该js负责接收前面(this)传过来的 commentid, commentnickname两个属性
+     */
+    function reply(obj) {
+        var messageId = $(obj).data('messageid');
+        var messageNickname = $(obj).data('messagenickname');
+        //搜索前面  name="content" 发现它是输入留言内容的区域 parentComment.id也是那个表单里面的东西
+        $("[name='content']").attr("placeholder", "@"+messageNickname).focus();     //给留言内容区域显示 @昵称（做到回复某人消息的 @昵称 功能）
+        $("[name='parentMessage.id']").val(messageId);  //将隐藏域的commentId赋值
+        $(window).scrollTo($('#comment-form'),500);     //如果你点击了回复按钮，将页面滚动到回复功能那里
+    }
+    
+</script>
+</body>
+</html>

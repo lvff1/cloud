@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.daji.dao.CommentDao">
+
+    <resultMap id="commentlist" type="com.daji.pojo.Comment">
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="content" column="content"/>
+        <result property="avatar" column="avatar"/>
+        <result property="createTime" column="create_time"/>
+        <result property="parentCommentId" column="parent_comment_id"/>
+        <result property="adminComment" column="admin_comment"/>
+        <result property="blogId" column="blogId"/>
+    </resultMap>
+    <resultMap id="messagelist" type="com.daji.pojo.Message">
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="email" column="email"/>
+        <result property="content" column="content"/>
+        <result property="avatar" column="avatar"/>
+        <result property="createTime" column="create_time"/>
+        <result property="parentMessageId" column="parent_message_id"/>
+        <result property="adminMessage" column="admin_message"/>
+    </resultMap>
+
+    <select id="findByBlogIdParentIdNull" resultMap="commentlist" parameterType="int">
+        select *
+        from t_comment c
+        where c.blogId = #{blogId} and c.parent_comment_id = -1
+        order by c.create_time desc
+    </select>
+
+    <!--查询非父级评论-->
+    <select id="findByBlogIdParentIdNotNull" resultMap="commentlist">
+        select *
+        from t_comment c
+        where c.blogId = #{blogId} and c.parent_comment_id = #{id}
+        order by c.create_time desc
+    </select>
+
+    <insert id="saveComment" parameterType="com.daji.pojo.Comment">
+        insert into t_comment (nickname,email,content,avatar,create_time,blogId,parent_comment_id,admin_comment)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{blogId},#{parentCommentId},#{adminComment});
+    </insert>
+
+    <!--查询非父级留言-->
+    <select id="findMessageByParentId" resultMap="messagelist">
+        select *
+        from t_message m
+        where m.parent_message_id = #{parentId}
+        order by m.create_time desc
+    </select>
+
+    <insert id="saveMessage" parameterType="com.daji.pojo.Message">
+        insert into t_message (nickname,email,content,avatar,create_time,parent_message_id,admin_message)
+        values (#{nickname},#{email},#{content},#{avatar},#{createTime},#{parentMessageId},#{adminMessage});
+    </insert>
+
+</mapper>

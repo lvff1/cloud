@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理</title>
+    <link th:href="@{/images/favicon.ico}" href="../../static/images/favicon.ico" rel="icon" type="image/x-ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+    <link th:href="@{/css/me.css}" rel="stylesheet" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--导航栏-->
+<nav class="ui inverted gird-header" >
+    <div class="ui container">
+        <div class="ui inverted secondary stackable menu">
+            <h2 class="ui olive header item" style="font-family: STSong">管理后台</h2>
+            <a href="#" th:href="@{/admin/blogs}" class="m-item item m-mobile-hide"><i class="home icon"></i>文章管理</a>
+            <a href="#" th:href="@{/admin/types}" class="m-item item m-mobile-hide"><i class="clone outline icon"></i>分类管理</a>
+            <a href="#" th:href="@{/admin/friendlinks}" class="m-item item m-mobile-hide"><i class="pencil alternate icon"></i>友链管理</a>
+            <a href="#" th:href="@{/admin/pictures}" class=" m-item item m-mobile-hide"><i class="image icon"></i>相册管理</a>
+            <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+            <div class="right m-item m-mobile-hide menu" th:if="${session.loginedadmin}">
+                <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                <div class="ui dropdown  item">
+                    <div class="text">
+                        <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+                        <img class="ui avatar image" src="/images/dajiavatar.jpg">
+                        <!--非常重要, model.addAttribute传对象 的前端接收!-->
+                        <span th:text="${session.loginedadmin.nickname}"></span>
+                    </div>
+                    <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" th:href="@{/admin/adminlogout}">注销</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+<br>
+<br>
+<br>
+
+<!--中间内容-->
+<div  class="m-padded-tb-massivex">
+    <div class="ui container">
+        <div class="ui success large  message">
+            <p align="center">念念不忘，必有回响</p>
+        </div>
+
+        <img src="../../../static/images/backimg.jpg" alt="" class="ui rounded bordered fluid image">
+    </div>
+</div>
+
+<!--底部栏-->
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+
+<script>
+
+    // $('#newblog-container').load(/*[[@{/footer/newblog}]]*/"/footer/newblog");
+
+
+    $('#blog-message').load(/*[[@{/footer/blogmessage}]]*/"/footer/blogmessage");
+    // 运行时间统计
+    function secondToDate(second) {
+        if (!second) {
+            return 0;
+        }
+        var time = new Array(0, 0, 0, 0, 0);
+        if (second >= 365 * 24 * 3600) {
+            time[0] = parseInt(second / (365 * 24 * 3600));
+            second %= 365 * 24 * 3600;
+        }
+        if (second >= 24 * 3600) {
+            time[1] = parseInt(second / (24 * 3600));
+            second %= 24 * 3600;
+        }
+        if (second >= 3600) {
+            time[2] = parseInt(second / 3600);
+            second %= 3600;
+        }
+        if (second >= 60) {
+            time[3] = parseInt(second / 60);
+            second %= 60;
+        }
+        if (second > 0) {
+            time[4] = second;
+        }
+        return time;
+    }
+    function setTime() {
+        /*此处为网站的创建时间*/
+        var create_time = Math.round(new Date(Date.UTC(2020, 01, 25, 15, 15, 15)).getTime() / 1000);
+        var timestamp = Math.round((new Date().getTime() + 8 * 60 * 60 * 1000) / 1000);
+        currentTime = secondToDate((timestamp - create_time));
+        currentTimeHtml = currentTime[0] + '年' + currentTime[1] + '天'
+            + currentTime[2] + '时' + currentTime[3] + '分' + currentTime[4]
+            + '秒';
+        document.getElementById("htmer_time").innerHTML = currentTimeHtml;
+    }
+    setInterval(setTime, 1000);
+
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $('.ui.dropdown').dropdown({
+        on : 'hover'
+    });
+
+</script>
+</body>
+</html>

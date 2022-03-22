@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width" />
+    <meta name="author" content="www.yanshisan.cn" />
+    <meta name="robots" content="all" />
+    <title>日记</title>
+    <link th:href="@{/font-awesome/css/font-awesome.min.css}" rel="stylesheet" href="../static/font-awesome/css/font-awesome.min.css">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" href="../static/layui/css/layui.css" />
+    <link th:href="@{/css/master.css}" rel="stylesheet" href="../static/css/master.css" />
+    <link th:href="@{/css/gloable.css}" rel="stylesheet" href="../static/css/gloable.css" />
+    <link th:href="@{/css/nprogress.css}" rel="stylesheet" href="../static/css/nprogress.css" />
+    <link th:href="@{/css/timeline.css}" rel="stylesheet" href="../static/css/timeline.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+</head>
+<body>
+    <div class="header">
+    </div>
+    <header class="gird-header">
+        <div class="header-fixed">
+            <div class="header-inner">
+                <a href="javascript:void(0)" class="header-logo" id="logo" style="margin-top: 20px">Daji's Blog</a>
+                <nav class="nav" id="nav">
+                    <ul>
+                        <li><a href="index.html" th:href="@{/index}">首页</a></li>
+                        <li><a href="article.html" th:href="@{/article}">博客</a></li>
+                        <li><a href="message.html" th:href="@{/message}">留言</a></li>
+                        <li><a href="link.html" th:href="@{/link}">友链</a></li>
+                        <li><a href="diary.html" th:href="@{/diary}">开发日志</a></li>
+                        <li><a href="about.html" th:href="@{/about}">关于我</a></li>
+                    </ul>
+                </nav>
+                <a th:href="@{/toUserLogin}" class="blog-user" th:if="${session.logineduser}==null">
+                    <i class="fa fa-user-circle-o"></i>
+                </a>
+
+                <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+                <div class="right m-item m-mobile-hide menu" align="right" th:if="${session.logineduser}">
+                    <br>
+                    <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                    <div class="ui dropdown  item">
+                        <div class="text">
+                            <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+                            <img class="ui avatar image" th:src="${session.logineduser.avatar}">
+                            <!--非常重要, model.addAttribute传对象 的前端接收!-->
+                            <span th:text="${session.logineduser.nickname}"></span>
+                        </div>
+                        <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" th:href="@{/logout}">注销</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="phone-menu">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <br>
+    <br>
+    <br><br>
+    <br>
+    <br>
+
+    <!--中间内容-->
+    <div  class="doc-container" id="doc-container"> <!---->
+        <div class="ui container">
+            <div align="left">
+                <a href="#" th:href="@{/article}">
+                    <button type="button" class="ui teal button m-mobile-wide m-margin-top"><i class="chevron left icon"></i>返回全部博客列表</button>
+                </a>
+            </div>
+            <br>
+            <div id="table-container">
+                <table th:fragment="blogList" class="ui compact teal table" style="margin: 1px">
+                    <div class="ui fluid button" align="center" style="color: #A0A0A0"><font size="4" color="#708090">搜索结果</font></div>
+                    <thead>
+                    <tr align="center">
+                        <th>ID</th>
+                        <th>标题</th>
+                        <th>类型</th>
+                        <th>推荐</th>
+                        <th>更新时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr align="center" th:each="blog,iterStat : ${blogQueries}">
+                        <td th:text="${iterStat.count}">1</td>
+                        <td><a th:href="@{/article/read/{id}(id=${blog.id})}" th:text="${blog.title}">博客标题</a></td>
+                        <td th:text="${blog.types[0].name}">博客的分类们</td>
+                        <td th:text="${blog.recommend} ? '是':'否'">是</td>
+                        <!--日期和时间格式是这么写的-->
+                        <td th:text="${#dates.format(blog.updateTime,'yyyy-MM-dd HH:mm')}">2020-01-02 05:20</td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="7">
+                            <div class="ui inverted divided stackable grid">
+                                <div class="three wide column" align="center">
+                                    <!--上一页的校验逻辑，比较麻烦-->
+                                    <a class="item" th:href="@{/article/search(startIndex=${recentStartIndex-pageSize > 0} ? ${recentStartIndex-pageSize} : 0,title=${searchBlog.title},typeId=${searchBlog.typeId})}" >上一页</a>
+                                </div>
+
+                                <div class="ten wide column" align="center">
+                                    <!--
+                                      第几页能算出来：
+                                      pagesize：  3
+                                      startIndex：0   3   6   9    是一个从0开始，每次+pagesize的关系
+                                      当前页：    1   2    3   4
+                                      通过观察可得之，当前是第几页就是 recentStartIndex/pageSize+1
+                                    -->
+                                    <p>第 <span th:text="${recentStartIndex/pageSize+1}"></span> 页，共 <span th:text="${totalPages}"></span> 页，有 <span th:text="${totalBlogs}"></span> 篇文章</p>
+                                </div>
+
+                                <div class="three wide column" align="center">
+                                    <!--
+                                      为啥下一页不做校验了？因为下一页的校验在后台完成了，前台不用担心
+                                      感觉这里没有体现出前后端分离，代码比较耦合
+                                      括号传递多个参数，用，逗号。浏览器会自动拼接成&
+                                      打断点和单步调试在这里立了大功！！！！！！！！！！！！
+                                    -->
+                                    <a class="item" th:href="@{/article/search(startIndex=${recentStartIndex+pageSize},title=${searchBlog.title},typeId=${searchBlog.typeId})}" >下一页</a>
+                                </div>
+                            </div>
+
+                        </th>
+                    </tr>
+                    </tfoot>
+                </table>
+
+                <div class="ui mini negative message" th:unless="${#strings.isEmpty(negativeMessage)}" th:text="|提示： ${negativeMessage}|">提示:</div>
+                <div class="ui success message" th:unless="${#strings.isEmpty(message)}">
+                    <i class="close icon"></i>
+                    <div class="" th:text="|提示： ${message}">提示：操作成功！</div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <footer class="grid-footer">
+        <div class="footer-fixed">
+            <div class="copyright">
+                <div class="info">
+                    <div class="contact">
+                        <a href="https://blog.csdn.net/weixin_44757863/" class="csdn" target="_blank" title="csdn"><i class="fa fa-github"></i></a>
+                        <a href="https://wpa.qq.com/msgrd?v=3&uin=396000449&site=qq&menu=yes" class="qq" target="_blank"
+                           title="396000449"><i class="fa fa-qq"></i></a>
+                        <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=1134107721@qq.com"
+                           class="email" target="_blank" title="1134107721@qq.com"><i class="fa fa-envelope"></i></a>
+                        <a th:href="@{/images/weixin_add.png}" target="_blank" class="weixin"><i class="fa fa-weixin"></i></a>
+                    </div>
+                    <p class="mt05">
+                        Copyright &copy; 2020-2021 大吉 All Rights Reserved <a href="http://beian.miit.gov.cn" target="_blank" style="color: inherit;">鲁ICP备2020049465号</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <script th:src="@{/layui/layui.js}" src="../static/layui/layui.js"></script>
+    <script th:src="@{/js/yss/gloable.js}" src="../static/js/yss/gloable.js"></script>
+    <script th:src="@{/js/plugins/nprogress.js}" src="../static/js/plugins/nprogress.js"></script>
+    <script>NProgress.start();</script>
+    <script th:src="@{/js/pagediary.js}" src="../static/js/pagediary.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+    <script>
+        //必须加上这里, 否则最右上角的下拉菜单的注销不会显示
+        /*
+            2020/12/2 调试了3小时都没找出来下拉注销不显示的原因。就是因为下面的 jquery和semantic版本的问题，必须是以下两个版本组合：
+            src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"
+            src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js
+            最开头的link里面引用的css也要对（上面是js）
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+        */
+        $('.ui.dropdown').dropdown({
+            on: 'hover'
+        });
+        window.onload = function () {
+            NProgress.done();
+        };
+    </script>
+</body>
+</html>

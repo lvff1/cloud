@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.daji.dao.BlogDao">
+    <!--
+        resultMap系列
+        可以看到,该项目由于blog类本身是在太大, 配的都是blog的儿子们(即com.lubenwe.vo下的类)
+        配好的在上半部分, 下半部分是没配好的
+    -->
+
+    <resultMap id="blogquery" type="com.daji.vo.BlogQuery">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="recommend" column="recommend"/>
+        <result property="published" column="published"/>
+
+        <result property="flag" column="flag"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="description" column="description"/>
+        <result property="views" column="views"/>
+        <result property="commentCount" column="comment_count"/>
+
+        <!--如果属性是一个Java类的话,就需要配置association; 如果属性是一个集合, 那就需要配置collection-->
+        <collection property="types" ofType="Type">
+            <result property="id" column="tid" />
+            <result property="name" column="tname" />
+        </collection>
+    </resultMap>
+
+    <resultMap id="showblog" type="com.daji.vo.ShowBlog">
+        <id property="id" column="id"/>
+        <result property="flag" column="flag"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="description" column="description"/>
+        <result property="recommend" column="recommend"/>
+        <result property="published" column="published"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="views" column="views"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="types" ofType="Type">
+            <result property="id" column="tid" />
+            <result property="name" column="tname" />
+        </collection>
+    </resultMap>
+
+    <!--分割线=========下面是没配好的-->
+
+    <!--<resultMap id="Admin" type="com.daji.pojo.Admin">
+        &lt;!&ndash;column指的是数据库的字段(很好理解,就是列嘛), property指的是对应实体类的属性(property字面翻译就是属性)&ndash;&gt;
+        <id property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="adminname" column="adminname"/>
+        <result property="email" column="email"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+
+
+    <resultMap id="firstPageBlog" type="com.daji.vo.FirstPageBlog">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="views" column="views"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="description" column="description"/>
+
+        <result property="typeName" column="name"/>
+
+        <result property="nickname" column="nickname"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+    <resultMap id="recommendBlog" type="com.daji.vo.RecommendBlog">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="recommend" column="recommend"/>
+        <result property="firstPicture" column="first_picture"/>
+    </resultMap>
+
+    <resultMap id="detailedBlog" type="com.daji.vo.DetailedBlog">
+        <id property="id" column="bid"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="typeName" column="name"/>
+
+        <result property="views" column="views"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="nickname" column="nickname"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>-->
+
+    <!--查询文章管理列表-->
+    <!--
+        注意看第一条sql语句：  SELECT b.id,b.title,b.update_time,b.recommend,b.published,t.id tid,t.name tname
+        这里我为什么给t.id起了别名tid
+        原因是因为t表的 id 和 b表的id 冲突
+        这样的话resultMap结果集映射会因为这个冲突出bug
+        该bug我已经总结至CSDN博客： 【MyBatis-Debug】在SQL语句中为数据库字段取别名的重要性
+    -->
+    <select id="queryAllBlog" resultMap="blogquery">
+        SELECT
+            b.id,b.title,b.update_time,b.recommend,b.published,t.id tid,t.name tname
+        FROM
+            t_blog b
+        INNER JOIN
+            blog_type bt
+        ON
+            b.`id`=bt.`bid`
+        INNER JOIN
+            t_type t
+        ON
+            bt.`tid`=t.`id`
+        order by b.id
+    </select>
+    <!--查询所有博客（根据浏览量排序，只查询前8个。因为热门文章只有前8篇）-->
+    <select id="queryAllBlogOrderByViews" resultMap="blogquery">
+        SELECT
+            b.id,b.title,b.update_time,b.recommend,b.flag,b.first_picture,b.description,b.views,b.comment_count,b.published,t.id tid,t.name tname
+        FROM
+            (SELECT t_blog.`id`,t_blog.title,t_blog.update_time,t_blog.recommend,t_blog.flag,t_blog.first_picture,t_blog.description,t_blog.views,t_blog.comment_count,t_blog.published FROM t_blog ORDER BY t_blog.views DESC limit 0,8) b
+        INNER JOIN
+            blog_type bt
+        ON
+            b.`id`=bt.`bid`
+        INNER JOIN
+            t_type t
+        ON
+            bt.`tid`=t.`id`
+        order by b.views desc
+    </select>
+
+    <!--查询所有被推荐的博客（置顶模块） 按照update_time排序-->
+    <select id="queryAllRecommendBlog" resultMap="blogquery">
+        SELECT
+            b.id,b.title,b.update_time,b.recommend,b.flag,b.first_picture,b.description,b.views,b.comment_count,b.published
+        FROM
+            t_blog b
+         WHERE b.`recommend` = 1
+         ORDER BY b.`update_time` DESC
+    </select>
+
+
+
+    <!--
+        看代码的最后一行，排了两次序！ 因为第一次排序（第四行的select子句）排的序是第一次查询排的序。第二次排序（最后一行）又对第二次查询出来的总结果进行排序
+        该方法考虑到了置顶(recommend)优先!
+        至于怎么做到的，看我的csdn博客：SQL语句 ORDER BY 多条件排序优先级（嵌套if语句） https://blog.csdn.net/weixin_44757863/article/details/110839219
+        该方法首先根据updatetime排序，然后根据recommend排序。还能分页！
+        神奇的sql语句
+    -->
+    <select id="queryAllBlogByLimit" parameterType="map" resultMap="blogquery">
+        SELECT
+            b.id,b.title,b.update_time,b.recommend,b.flag,b.first_picture,b.description,b.views,b.comment_count,b.published,t.id tid,t.name tname
+        FROM
+            (SELECT t_blog.`id`,t_blog.title,t_blog.update_time,t_blog.recommend,t_blog.flag,t_blog.first_picture,t_blog.description,t_blog.views,t_blog.comment_count,t_blog.published FROM t_blog ORDER BY IF (t_blog.`recommend`='1',0,1),t_blog.`update_time` DESC LIMIT #{startIndex},#{pageSize}) b
+        INNER JOIN
+            blog_type bt
+        ON
+            b.`id`=bt.`bid`
+        INNER JOIN
+            t_type t
+        ON
+            bt.`tid`=t.`id`
+        ORDER BY IF (b.`recommend`='1',0,1),b.`update_time` DESC
+    </select>
+
+    <select id="getBlogsCount" resultType="int">
+        SELECT COUNT(*) FROM t_blog
+    </select>
+
+    <select id="searchByTitleOrType" parameterType="com.daji.vo.SearchBlog" resultMap="blogquery">
+        SELECT
+        b.id,b.title,b.update_time,b.recommend,b.views,b.published,b.description,b.first_picture,t.id tid,t.name tname
+        FROM
+        t_blog b
+        INNER JOIN
+        blog_type bt
+        ON
+        b.`id`=bt.`bid`
+        INNER JOIN
+        t_type t
+        ON
+        bt.`tid`=t.`id`
+        <where>
+            <if test="typeId">
+                t.id = #{typeId}
+            </if>
+            <if test="title">
+                and b.title like '%${title}%'
+            </if>
+        </where>
+        ORDER BY id desc
+    </select>
+
+    <!--
+        测一下别名有没有用，下一行的parameterType直接写blog
+        一共要插入15个东西 (除了id都要插入。id自增)
+        typeId让我给删了，因为多对多
+
+        因为多对多问题要排的坑：由于blog和type是多对多关系，且blog主键是自增的，所有我们没办法提前知晓这个blog_id，所以插入的时候，
+                               就需要先插入blog，然后再找到刚插入的id拿出来，再插入中间表blog_type，这样才能将表关系对应起来，才能算一个完整的插入的过程。
+
+        解决方案：https://blog.csdn.net/u010857795/article/details/71512044
+
+        下面的三个参数：
+        useGeneratedKeys （仅对 insert 和 update 有用）这会令 MyBatis 使用 JDBC 的 getGeneratedKeys
+                           方法来取出由数据库内部生成的主键（比如：像 MySQL 和 SQL Server 这样的关系数据库管理系统的自动递增字段），默认值：false。
+        keyProperty （仅对 insert 和 update 有用）唯一标记一个属性，MyBatis 会通过 getGeneratedKeys
+                      的返回值或者通过 insert 语句的 selectKey 子元素设置它的键值，默认：unset。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
+                      注意！ keyProperty是Java对象的属性名！
+        keyColumn （仅对 insert 和 update 有用）通过生成的键值设置表中的列名，这个设置仅在某些数据库（像 PostgreSQL）是必须的，
+                    当主键列不是表中的第一列的时候需要设置。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
+    -->
+    <insert id="insertBlogWithoutType" parameterType="blog" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_blog (title, content, first_picture, flag,
+        views, comment_count, appreciation, share_statement, commentabled, published,
+        recommend, create_time, update_time, admin_id, description)
+        values (#{title},#{content},#{firstPicture},#{flag},#{views},#{commentCount},#{appreciation},
+        #{shareStatement},#{commentabled},#{published},#{recommend},#{createTime},
+        #{updateTime},#{adminId},#{description});
+    </insert>
+    <insert id="insertBlog_Type">
+        insert into blog_type (bid, tid) values(#{blog.id},#{type.id})
+    </insert>
+
+    <!--编辑修改文章-->
+    <update id="updateBlogWithoutType" parameterType="blog">
+        update t_blog set published = #{published},flag = #{flag} ,
+        title = #{title}, content = #{content}, type_id = #{typeId},
+        first_picture = #{firstPicture} , description = #{description} , recommend = #{recommend} ,
+        share_statement = #{shareStatement}, appreciation = #{appreciation},
+        commentabled = #{commentabled} ,update_time = #{updateTime} where id = #{id};
+    </update>
+    <!--更新博客浏览量 每调用一次，浏览量就自增1-->
+    <update id="updateBlogViews" parameterType="int">
+        update t_blog set views = views+1 where id = #{id};
+    </update>
+
+
+    <!--查询编辑修改文章-->
+    <select id="getBlogById" resultMap="showblog">
+        SELECT
+        b.id,b.flag,b.title,b.content,b.type_id,b.views,b.update_time,
+        b.first_picture,b.description,b.recommend,b.published,b.share_statement,
+        b.appreciation,b.commentabled,t.id tid,t.name tname
+        FROM
+        t_blog b
+        INNER JOIN
+        blog_type bt
+        ON
+        b.`id`=bt.`bid`
+        INNER JOIN
+        t_type t
+        ON
+        bt.`tid`=t.`id`
+        where  b.id = #{id};
+    </select>
+
+    <!--只得到博客的标题-->
+    <select id="getBlogTitleById" resultType="string">
+        SELECT
+        b.title
+        FROM
+        t_blog b
+        where b.id = #{id};
+    </select>
+
+    <!--删除中间表的映射关系-->
+    <delete id="deleteBlog_Type">
+        delete from blog_type where bid = #{bid}
+    </delete>
+
+    <!--删除文章-->
+    <delete id="deleteBlog">
+        delete from t_blog where id = #{id}
+    </delete>
+
+</mapper>

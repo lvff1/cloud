@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分类管理</title>
+  <link th:href="@{/images/favicon.ico}" href="../../static/images/favicon.ico" rel="icon" type="image/x-ico">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.css">
+  <link rel="stylesheet" th:href="@{/css/me.css}" href="../../static/css/me.css">
+</head>
+<body>
+
+<!--导航栏-->
+<nav class="ui inverted gird-header" >
+  <div class="ui container">
+    <div class="ui inverted secondary stackable menu">
+      <h2 class="ui olive header item" style="font-family: STSong">管理后台</h2>
+      <a href="#" th:href="@{/admin/blogs}" class="m-item item m-mobile-hide"><i class="home icon"></i>文章管理</a>
+      <a href="#" th:href="@{/admin/types}" class="active m-item item m-mobile-hide"><i class="clone outline icon"></i>分类管理</a>
+      <a href="#" th:href="@{/admin/friendlinks}" class="m-item item m-mobile-hide"><i class="pencil alternate icon"></i>友链管理</a>
+      <a href="#" th:href="@{/admin/pictures}" class=" m-item item m-mobile-hide"><i class="image icon"></i>相册管理</a>
+      <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+      <div class="right m-item m-mobile-hide menu" th:if="${session.loginedadmin}">
+        <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+        <div class="ui dropdown  item">
+          <div class="text">
+            <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+            <img class="ui avatar image" src="/images/dajiavatar.jpg">
+            <!--非常重要, model.addAttribute传对象 的前端接收!-->
+            <span th:text="${session.loginedadmin.nickname}"></span>
+          </div>
+          <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+          <i class="dropdown icon"></i>
+          <div class="menu">
+            <a class="item" th:href="@{/admin/adminlogout}">注销</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a href="#" class="ui menu toggle black icon button m-right-top m-mobile-show">
+    <i class="sidebar icon"></i>
+  </a>
+</nav>
+
+<div class="m-padded-tb-hugex">
+  <div class="ui menu attached inverted" style="background-color:rgba(255, 255, 255, 0.1)">
+    <div class="ui container" >
+      <a th:href="@{/admin/types/input}" class="item" >发布</a>
+      <a th:href="@{/admin/types}" class="active item">列表</a>
+    </div>
+  </div>
+</div>
+
+<br>
+<br>
+<br>
+  <!--中间内容-->
+  <div  class="m-padded-tb-big">
+    <div class="ui container">
+      <div class="ui success message" th:unless="${#strings.isEmpty(message)}">
+        <i class="close icon"></i>
+        <div class="" th:text="|提示： ${message}|">提示：操作成功！</div>
+      </div>
+      <table class="ui compact teal table" >
+        <thead>
+          <tr align="center">
+            <th>ID</th>
+            <th>名称</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+        <!--
+            查阅thymeleaf官方文档,并搜索iterStat, 就可知道下面一行的iterStat是啥意思了
+            https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html
+            英文官方文档难吗?根本不难.
+            要对自己的英语水平有自信心.
+
+            注意的是 为什么是${pageInfo.list} 而不是直接 ${pageInfo}
+            非常简单，只需要在后台sout一下pageInfo究竟是个什么东西就知道了：
+            PageInfo{pageNum=1, pageSize=2, size=2, startRow=1, endRow=2, total=6, pages=3,
+                     list=Page{count=true, pageNum=1, pageSize=2, startRow=0, endRow=2, total=6, pages=3, reasonable=true, pageSizeZero=false}
+                     [Type{id=6, name='Debug专题'}, Type{id=5, name='SpringBoot'}],
+                     prePage=0, nextPage=2, isFirstPage=true, isLastPage=false, hasPreviousPage=false, hasNextPage=true, navigatePages=8,
+                     navigateFirstPage=1, navigateLastPage=3, navigatepageNums=[1, 2, 3]}
+            分析一下里面， 有一个list字段。这就是为什么必须是${pageInfo.list}的原因了
+            如果将来pageInfo里面传入的是别的属性, 需要在sout一下pageInfo,并分析出前台需要的是什么.
+
+            By the way, 注意一个字段 reasonable=true.
+            这个字段是不是很眼熟,我们在bean里面配置过了, 它生效了!
+        -->
+          <tr align="center" th:each="type,iterStat : ${pageInfo.list}">
+            <td th:text="${iterStat.count}">1</td>
+            <td th:text="${type.name}">Java专题</td>
+            <td>
+              <!--
+                @PathVariable的应用 : html端:
+
+                thymeleaf中,路径可以通过下一行的方式携带参数过去
+              -->
+              <a href="#" th:href="@{/admin/types/{id}/input(id=${type.id})}" class="ui mini teal basic button">编辑</a>
+              <a href="#" th:href="@{/admin/types/{id}/delete(id=${type.id})}"  onclick="return confirm('确定删除?')" class="ui mini red basic button">删除</a>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="6" >
+              <div class="ui inverted divided stackable grid">
+                <div class="three wide column" align="center">
+                  <!--
+                    理论上讲,我配置了reasonable,这里不需要太多的校验(下同)
+                    这里的 pageInfo. 点出来的这么多属性,从哪来的?
+                    和上面一样, 在后台sout一下pageInfo究竟是个什么东西就知道了.或者直接查阅官方文档,里面就有pageInfo的属性
+                  -->
+                  <a class="item" th:href="@{/admin/types(pageNum=${pageInfo.prePage})}" >上一页</a>
+                </div>
+
+                <div class="ten wide column" align="center">
+                  <!--这里的 pageInfo. 从哪点出来的这么多属性? 上面代码有解释-->
+                  <p>第 <span th:text="${pageInfo.pageNum}"></span> 页，共 <span th:text="${pageInfo.pages}"></span> 页，有 <span th:text="${pageInfo.total}"></span> 个分类</p>
+                </div>
+
+                <div class="three wide column" align="center">
+                  <!--同様,这里因为配置了reasonable,理论上不用担心越界问题,也就用不着校验-->
+                  <a class="item" th:href="@{/admin/types(pageNum=${pageInfo.nextPage})}">下一页</a>
+                </div>
+              </div>
+              <div align="center">
+              <a href="#" th:href="@{/admin/types/input}">
+                <button type="button" class="ui teal button m-mobile-wide m-margin-top"><i class="pencil icon"></i>新增</button>
+              </a>
+              </div>
+            </th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <br>
+  <br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+  <!--底部栏-->
+
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+
+  <script>
+
+      // $('#newblog-container').load(/*[[@{/footer/newblog}]]*/"/footer/newblog");
+
+      $('#blog-message').load(/*[[@{/footer/blogmessage}]]*/"/footer/blogmessage");
+      // 运行时间统计
+      function secondToDate(second) {
+          if (!second) {
+              return 0;
+          }
+          var time = new Array(0, 0, 0, 0, 0);
+          if (second >= 365 * 24 * 3600) {
+              time[0] = parseInt(second / (365 * 24 * 3600));
+              second %= 365 * 24 * 3600;
+          }
+          if (second >= 24 * 3600) {
+              time[1] = parseInt(second / (24 * 3600));
+              second %= 24 * 3600;
+          }
+          if (second >= 3600) {
+              time[2] = parseInt(second / 3600);
+              second %= 3600;
+          }
+          if (second >= 60) {
+              time[3] = parseInt(second / 60);
+              second %= 60;
+          }
+          if (second > 0) {
+              time[4] = second;
+          }
+          return time;
+      }
+      function setTime() {
+          /*此处为网站的创建时间*/
+          var create_time = Math.round(new Date(Date.UTC(2020, 01, 25, 15, 15, 15)).getTime() / 1000);
+          var timestamp = Math.round((new Date().getTime() + 8 * 60 * 60 * 1000) / 1000);
+          currentTime = secondToDate((timestamp - create_time));
+          currentTimeHtml = currentTime[0] + '年' + currentTime[1] + '天'
+              + currentTime[2] + '时' + currentTime[3] + '分' + currentTime[4]
+              + '秒';
+          document.getElementById("htmer_time").innerHTML = currentTimeHtml;
+      }
+      setInterval(setTime, 1000);
+
+    $('.menu.toggle').click(function () {
+      $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $('.ui.dropdown').dropdown({
+      on : 'hover'
+    });
+
+    //消息提示关闭初始化
+    $('.message .close')
+      .on('click', function () {
+        $(this)
+          .closest('.message')
+          .transition('fade');
+      });
+
+  </script>
+</body>
+</html>

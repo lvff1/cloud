@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width" />
+    <meta name="author" content="www.yanshisan.cn" />
+    <meta name="robots" content="all" />
+    <title>开发日志</title>
+    <link rel="stylesheet" th:href="@{/font-awesome/css/font-awesome.min.css}" href="../static/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}" href="../static/layui/css/layui.css" />
+    <link rel="stylesheet" th:href="@{/css/master.css}" href="../static/css/master.css" />
+    <link rel="stylesheet" th:href="@{/css/gloable.css}" href="../static/css/gloable.css" />
+    <link rel="stylesheet" th:href="@{/css/nprogress.css}" href="../static/css/nprogress.css" />
+    <link rel="stylesheet" th:href="@{/css/timeline.css}" href="../static/css/timeline.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+</head>
+<body>
+    <div class="header">
+    </div>
+    <header class="gird-header">
+        <div class="header-fixed">
+            <div class="header-inner">
+                <a href="javascript:void(0)" class="header-logo" id="logo" style="margin-top: 20px">Daji's Blog</a>
+                <nav class="nav" id="nav">
+                    <ul>
+                        <li><a href="index.html" th:href="@{/index}">首页</a></li>
+                        <li><a href="article.html" th:href="@{/article}">博客</a></li>
+                        <li><a href="message.html" th:href="@{/message}">留言</a></li>
+                        <li><a href="link.html" th:href="@{/link}">友链</a></li>
+                        <li><a href="diary.html" th:href="@{/diary}" class="active">开发日志</a></li>
+                        <li><a href="about.html" th:href="@{/about}">关于我</a></li>
+                    </ul>
+                </nav>
+                <a th:href="@{/toUserLogin}" class="blog-user" th:if="${session.logineduser}==null">
+                    <i class="fa fa-user-circle-o"></i>
+                </a>
+
+                <!--最右上角的头像和注销 只有用户登陆了,才会显示-->
+                <div class="right m-item m-mobile-hide menu" align="right" th:if="${session.logineduser}">
+                    <br>
+                    <!--注意下面这个下拉菜单, 必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                    <div class="ui dropdown  item">
+                        <div class="text">
+                            <!--这里有一个th, 让我给删了, 这个th的作用是, 动态显示别的用户的头像. 现在这个头像链接是死代码. 那行代码到lirenmi的项目去找-->
+                            <img class="ui avatar image" th:src="${session.logineduser.avatar}">
+                            <!--非常重要, model.addAttribute传对象 的前端接收!-->
+                            <span th:text="${session.logineduser.nickname}"></span>
+                        </div>
+                        <!--必须加一个JavaScript代码才能显示出来 JavaScript代码在下面-->
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a class="item" th:href="@{/logout}">注销</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="phone-menu">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="doc-container" id="doc-container">
+         <div class="container-fixed">
+            <div class="timeline-box shadow">
+                <div class="timeline-main">
+                    <h1><i class="fa fa-clock-o"></i>开发日志（随技术栈更新，功能会陆续添加）</h1>
+                    <div class="timeline-line"></div>
+                        <div class="timeline-year">
+                            <h2><a class="yearToggle">2020 年</a><i class="fa fa-caret-down fa-fw"></i></h2>
+                            <div class="timeline-month">
+                                <ul>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【上线】</font></p>
+                                            <p class="date">12月26日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>优化前台界面显示，博客正式上线。是结束，也是新的开始</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【Nginx】</font></p>
+                                            <p class="date">12月25日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>通过 Nginx 域名映射的方式，正式将 zr7.top 网址映射到了该博客</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date">12月18日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>博客开始试运营，将CSDN的技术文章同步至该博客</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【Redis】</font></p>
+                                            <p class="date">12月16日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>重大更新：集成Redis，个人博客项目的主营业务（对博客的CRUD操作），实现了从Redis中读，从MySQL中写</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【SpringBoot】</font></p>
+                                            <p class="date">12月14日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>升级架构：由原先的SSM架构升级到了SpringBoot。SpringBoot开箱即用，仅用一天便升级完成</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【阿里云】</font></p>
+                                            <p class="date">12月13日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>重大更新：购置了阿里云服务器(CentOS7)，将项目推送到了远端服务器中</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【留言】</font></p>
+                                            <p class="date">12月7日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>完成留言功能的级联关系(有点像单链表)</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【Swagger】</font></p>
+                                            <p class="date">12月5日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>集成了Swagger，并测试了部分接口</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【文件上传】</font></p>
+                                            <p class="date">12月3日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>集成了文件上传的相关操作，现在管理员可以上传博客的首图了！</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date"><font color="#008b8b" size="3">【Shiro】</font></p>
+                                            <p class="date">12月1日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span></span>因毕业设计原因停更一周左右，今日集成了安全框架————Shiro</p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                    <li>
+                                        <div class="h4 animated fadeInLeft">
+                                            <p class="date">11月25日</p>
+                                        </div>
+                                        <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                        <div class="content animated fadeInRight"><p><span>博客基本功能至此已经全部实现完毕，接下来随技术栈更新，陆续添加功能</span></p></div>
+                                        <div class="clear"></div>
+                                    </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date"><font color="#008b8b" size="3">【全局搜索】</font></p>
+                                                        <p class="date">11月22日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>更新了全局搜索功能</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date"><font color="#008b8b" size="3">【分页】</font></p>
+                                                        <p class="date">11月20日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>不使用PageHelper，手撕了分页逻辑。完成了多对多的分页，前端回显，多对多查询等等</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date">11月18日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>前台展示的基本功能实现完毕</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date">11月17日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>彻底完成了后台管理的分类管理，博客管理部分</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date"><font color="#008b8b" size="3">[PageHelper]</font></p>
+                                                        <p class="date">11月16日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>集成PageHelper分页插件</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date"><font color="#008b8b" size="3">【邮件激活】</font></p>
+                                                        <p class="date">11月11日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>完成前台注册，登录及邮件验证逻辑</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date">11月08日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>进行了数据库设计，建立数据表及其关联关系</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date">11月04日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>找到了合适的前端模板，自己进行了样式上的微调，敲定了前端的展示页面</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date"><font color="#008b8b" size="3">【架构】</font></p>
+                                                        <p class="date">11月03日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p><span>使用思维导图，抽象出博客功能，大致构建出该项目的接口设计，以及UML图</span></p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                                <li>
+                                                    <div class="h4 animated fadeInLeft">
+                                                        <p class="date">11月01日</p>
+                                                    </div>
+                                                    <p class="dot-circle animated "><i class="fa fa-dot-circle-o"></i></p>
+                                                    <div class="content animated fadeInRight"><p>梦开始的地方：通过学习他人的开源项目，构建好了项目的大致骨架，确定了技术架构</p></div>
+                                                    <div class="clear"></div>
+                                                </li>
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                    <h1 style="padding-top:4px;padding-bottom:2px;margin-top:40px;"><i class="fa fa-hourglass-end"></i>THE END</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="grid-footer">
+        <div class="footer-fixed">
+            <div class="copyright">
+                <div class="info">
+                    <div class="contact">
+                        <a href="https://blog.csdn.net/weixin_44757863/" class="csdn" target="_blank" title="csdn"><i class="fa fa-github"></i></a>
+                        <a href="https://wpa.qq.com/msgrd?v=3&uin=396000449&site=qq&menu=yes" class="qq" target="_blank"
+                           title="396000449"><i class="fa fa-qq"></i></a>
+                        <a href="https://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=1134107721@qq.com"
+                           class="email" target="_blank" title="1134107721@qq.com"><i class="fa fa-envelope"></i></a>
+                        <a th:href="@{/images/weixin_add.png}" target="_blank" class="weixin"><i class="fa fa-weixin"></i></a>
+                    </div>
+                    <p class="mt05">
+                        Copyright &copy; 2020-2021 大吉 All Rights Reserved <a href="http://beian.miit.gov.cn" target="_blank" style="color: inherit;">鲁ICP备2020049465号</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script th:src="@{/layui/layui.js}" src="../static/layui/layui.js"></script>
+    <script th:src="@{/js/yss/gloable.js}" src="../static/js/yss/gloable.js"></script>
+    <script th:src="@{/js/plugins/nprogress.js}" src="../static/js/plugins/nprogress.js"></script>
+    <script>NProgress.start();</script>
+    <script th:src="@{/js/pagediary.js}" src="../static/js/pagediary.js"></script>
+    <script src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+    <script>
+        //必须加上这里, 否则最右上角的下拉菜单的注销不会显示
+        /*
+            2020/12/2 调试了3小时都没找出来下拉注销不显示的原因。就是因为下面的 jquery和semantic版本的问题，必须是以下两个版本组合：
+            src="https://cdn.staticfile.org/jquery/3.1.1/jquery.min.js"
+            src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js
+            最开头的link里面引用的css也要对（上面是js）
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+        */
+        $('.ui.dropdown').dropdown({
+            on: 'hover'
+        });
+        window.onload = function () {
+            NProgress.done();
+        };
+    </script>
+</body>
+</html>

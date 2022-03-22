@@ -1,0 +1,159 @@
+CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <meta charset="UTF-8">
+    <!--移动端的预览设置，用于适配移动端-->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/Semantic-UI-CSS-master/semantic.min.css}" href="../static/Semantic-UI-CSS-master/semantic.min.css">
+    <link rel="stylesheet" th:href="@{/css/myblog.css}" href="../static/css/myblog.css">
+    <title>登陆到账号</title>
+    <script type="text/javascript">
+        //实现点击一下验证码图片就能自动刷新. 本质上是请求一个新的时间戳,还是返回它本身.
+        function refreshCode() {
+            document.getElementById("vcode").src = "/getVerifyCode?time=" + new Date().getTime();
+        }
+    </script>
+
+
+</head>
+<body style="background-image: url(/images/dashboardbackground.png)">
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+
+<div class="ui middle aligned center aligned grid m-container-small m-padded-tb-big">
+    <div class="column">
+        <h2 class="ui teal image header">
+            <div class="content header">
+                注册账号
+            </div>
+        </h2>
+
+
+
+        <form class="ui large form" method="post" th:action="@{/register/submit}">
+            <div class="ui stacked segment" style="background-color:rgba(255, 255, 255, 0.1)">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="id card icon"></i>
+                        <!--这里的name 最好和数据库字段的name一样！ -->
+                        <input type="text" name="email" placeholder="邮箱地址" th:value="${recentemail}">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="nickname" placeholder="昵称" th:value="${recentnickname}">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="pwd" placeholder="密码">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="text" name="checkcode" placeholder="验证码">
+                        &nbsp&nbsp&nbsp
+                        <a href="javascript:refreshCode()"><img th:src="@{/getVerifyCode}" title="看不清?点击刷新" id="vcode"/></a>
+                    </div>
+                </div>
+
+                <div class="ui fluid large teal submit button">注册</div>
+            </div>
+
+                <div class="ui error message"></div>
+                <!--回显错误信息-->
+                <div class="field">
+                    <tr th:each="error:${errorList}">
+                        <font color="red"><td th:text="${error}"></td></font>
+                        <br><br>
+                    </tr>
+                </div>
+        </form>
+        <div class="ui inverted form message" style="background-color:rgba(255, 255, 255, 0.1)">
+            <a th:href="@{/article}"><font color="#faebd7">回首页</font></a>
+        </div>
+    </div>
+</div>
+
+
+
+<!---->
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<!--底部footer-->
+
+
+
+<script th:src="@{/js/jquery-3.5.1.min.js}" src="../static/js/jquery-3.5.1.min.js"></script>
+<script th:src="@{/Semantic-UI-CSS-master/semantic.min.js}" src="../static/Semantic-UI-CSS-master/semantic.min.js"></script>
+<script type="text/javascript">
+
+    $("#b1").click(function () {
+        $(".m-item").toggleClass("m-mobile-hide");
+    });
+
+
+    $('.ui.dropdown').dropdown({
+        on: 'hover'
+    })
+
+    /*这里是表单验证的 如果你有哪个必填项填错了, 注册表单根本就不会提交. 而且会给出用户提示*/
+    $('.ui.form').form({
+        fields:{
+            nickname:{
+                identifier:'nickname',
+                rules:[{
+                    type:'empty',
+                    prompt:'用户昵称：请输入用户昵称'
+                }]
+            },
+            password:{
+                identifier:'pwd',
+                rules:[{
+                    type:'empty',
+                    prompt:'密码：密码不能为空'
+                }]
+            },
+            checkcode:{
+                identifier:'checkcode',
+                rules:[{
+                    type:'empty',
+                    prompt:'验证码：验证码不能为空'
+                }]
+            },
+            email:{
+                identifier:'email',
+                rules:[{
+                    type:'empty',
+                    prompt:'邮箱：请输入邮箱地址'
+                }]
+            }
+        }
+    })
+
+
+
+</script>
+
+</body>
+</html>
